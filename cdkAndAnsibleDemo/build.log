@@ -1,0 +1,39 @@
+==> amazon-ebs: Prevalidating AMI Name: packer-quick-start 1570022316
+    amazon-ebs: Found Image ID: ami-0ff21806645c5e492
+==> amazon-ebs: Creating temporary keypair: packer_5d94a3ac-9a77-5c31-90f8-91606aba7b2a
+==> amazon-ebs: Creating temporary security group for this instance: packer_5d94a3b0-1408-890b-b2e1-2687c01e87c8
+==> amazon-ebs: Authorizing access to port 22 from [0.0.0.0/0] in the temporary security groups...
+==> amazon-ebs: Launching a source AWS instance...
+==> amazon-ebs: Adding tags to source instance
+    amazon-ebs: Adding tag: "Name": "Packer Builder"
+    amazon-ebs: Instance ID: i-0783d5e48e76da485
+==> amazon-ebs: Waiting for instance (i-0783d5e48e76da485) to become ready...
+==> amazon-ebs: Using ssh communicator to connect: 3.112.106.25
+==> amazon-ebs: Waiting for SSH to become available...
+==> amazon-ebs: Connected to SSH!
+==> amazon-ebs: Provisioning with Ansible...
+==> amazon-ebs: Executing Ansible: ansible-playbook --extra-vars packer_build_name=amazon-ebs packer_builder_type=amazon-ebs -o IdentitiesOnly=yes -i /var/folders/q6/k744b36n0lvc015zdmby6yfr0000gn/T/packer-provisioner-ansible158915183 /Users/nyamada/go/src/github.com/nyamada43/demoAWSIaS/cdkDemo01/ansible/main.yaml -e ansible_ssh_private_key_file=/var/folders/q6/k744b36n0lvc015zdmby6yfr0000gn/T/ansible-key040994128
+    amazon-ebs:
+    amazon-ebs: PLAY [all] *********************************************************************
+    amazon-ebs:
+    amazon-ebs: TASK [be sure httpd is installed] **********************************************
+    amazon-ebs:  [WARNING]: Platform linux on host default is using the discovered Python
+    amazon-ebs: fatal: [default]: FAILED! => {"ansible_facts": {"discovered_interpreter_python": "/usr/bin/python"}, "changed": false, "changes": {"installed": ["httpd"]}, "msg": "You need to be root to perform this command.\n", "rc": 1, "results": ["Loaded plugins: extras_suggestions, langpacks, priorities, update-motd\n"]}
+    amazon-ebs: interpreter at /usr/bin/python, but future installation of another Python
+    amazon-ebs:
+    amazon-ebs: interpreter could change this. See https://docs.ansible.com/ansible/2.8/referen
+    amazon-ebs: PLAY RECAP *********************************************************************
+    amazon-ebs: ce_appendices/interpreter_discovery.html for more information.
+    amazon-ebs: default                    : ok=0    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0
+    amazon-ebs:
+==> amazon-ebs: Terminating the source AWS instance...
+==> amazon-ebs: Cleaning up any extra volumes...
+==> amazon-ebs: No volumes to clean up, skipping
+==> amazon-ebs: Deleting temporary security group...
+==> amazon-ebs: Deleting temporary keypair...
+Build 'amazon-ebs' errored: Error executing Ansible: Non-zero exit status: exit status 2
+
+==> Some builds didn't complete successfully and had errors:
+--> amazon-ebs: Error executing Ansible: Non-zero exit status: exit status 2
+
+==> Builds finished but no artifacts were created.

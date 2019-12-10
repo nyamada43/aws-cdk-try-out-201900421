@@ -1,0 +1,36 @@
+---
+# https://docs.aws.amazon.com/ja_jp/codebuild/latest/userguide/build-spec-ref.html
+version: 0.2
+
+run-as: root
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.7
+  pre_build:
+    commands:
+      - cd ./cdkDemo01 && ls -l
+      - python --version
+      - pip --version
+      - curl -qL -o packer.zip https://releases.hashicorp.com/packer/1.4.3/packer_1.4.3_linux_amd64.zip && unzip packer.zip
+      - ./packer version
+      - pip install --user ansible==2.8.5
+      - ansible --version
+      - echo 'Validate packer json'
+      - ./packer validate packer.json
+  build:
+    commands:
+      - ./packer build -color=false packer.json
+  post_build:
+    commands:
+      - TARGET_DATE=$(date +%s -d '5 days')
+      - echo TARGET_DATE $TARGET_DATE
+      ## For test
+      # - ret=$(aws ec2 describe-snapshots --filters "Name=tag:role,Values='test'" | jq ' .Snapshots[] | {Description,SnapshotId,StartTime} | select ( .StartTime | split(".") | first + "Z" | fromdateiso8601 <= "${TARGET_DATE}") ')
+      - ret=$(aws ec2 describe-snapshots --filters "Name=tag:role,Values='test'" | jq ' .Snapshots[] | {Description,SnapshotId,StartTime} | select ( .StartTime | split(".") | first + "Z" | fromdateiso8601 >= "${TARGET_DATE}") ')
+      - echo $ret | jq .
+      - echo $ret | jq .Description | awk '{ print $5 }' | xargs -I {} echo {}
+      - echo $ret | jq .Description | awk '{ print $5 }' | xargs -I {} aws ec2 deregister-image --image-id {}
+      - echo $ret | jq .SnapshotId | xargs -I {} echo {}
+      - echo $ret | jq .SnapshotId | xargs -I {} aws ec2 delete-snapshot --snapshot-id {}

@@ -1,0 +1,61 @@
+---
+- hosts: all
+  become: yes
+  gather_facts: no
+  tasks:
+    - name: upgrade all packages
+      yum:
+        name: '*'
+        state: latest
+    - name: be sure httpd is installed
+      yum:
+        name: httpd
+        state: installed
+    - name: be sure httpd is running and enabled
+      systemd:
+        name: httpd
+        state: started
+        enabled: yes
+# https://docs.aws.amazon.com/ja_jp/AmazonCloudWatch/latest/monitoring/download-cloudwatch-agent-commandline.html
+    - name: be sure cloudwatch agent get rpm
+      get_url:
+        url: https://s3.ap-northeast-1.amazonaws.com/amazoncloudwatch-agent-ap-northeast-1/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+        dest: /root
+    - name: be sure cloudwatch agent is installed
+      yum:
+        name: /root/amazon-cloudwatch-agent.rpm
+        state: installed
+    - name: be sure cloudwatch agent is running and enabled
+      systemd:
+        name: amazon-cloudwatch-agent.service
+        state: started
+        enabled: yes
+# https://docs.aws.amazon.com/ja_jp/systems-manager/latest/userguide/sysman-manual-agent-install.html#agent-install-al
+    - name: ssm agent get rpm
+      get_url:
+        url: https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+        dest: /root
+    - name: ssm agent install
+      yum:
+        name: /root/amazon-ssm-agent.rpm
+        state: installed
+    - name: ssm agent run
+      systemd:
+        name: amazon-ssm-agent.service
+        state: started
+        enabled: yes
+# https://docs.aws.amazon.com/streams/latest/dev/writing-with-agents.html
+    # ? Amazon linux 2用のリンクがない
+    - name: firehose agent get rpm
+      get_url:
+        url: https://s3.amazonaws.com/streaming-data-agent/aws-kinesis-agent-latest.amzn1.noarch.rpm
+        dest: /root
+    - name: firehose agent install
+      yum:
+        name: /root/aws-kinesis-agent-latest.amzn1.noarch.rpm
+        state: installed
+    - name: firehose agent run
+      systemd:
+        name: aws-kinesis-agent.service
+        state: started
+        enabled: yes
